@@ -33,12 +33,12 @@ jobs:
             sudo apt-get clean
             sudo rm -rf /usr/local/lib/android /usr/local/lib/node_modules /opt/ghc
             sudo rm -rf /usr/lib/jvm /usr/lib/llvm /usr/share/dotnet /var/lib/apt/lists/*
-            sudo docker rmi $(docker images -q) || true
+            docker images -q | xargs -r sudo docker rmi || true
          
        - name: Initializing environment
          run: |
             sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
-            docker rmi `docker images -q`
+            docker images -q | xargs -r docker rmi || true
             sudo apt-get remove account-plugin-facebook account-plugin-flickr account-plugin-jabber account-plugin-salut account-plugin-twitter account-plugin-windows-live account-plugin-yahoo aisleriot brltty duplicity empathy empathy-common example-content gnome-accessibility-themes gnome-contacts gnome-mahjongg gnome-mines gnome-orca gnome-screensaver gnome-sudoku gnome-video-effects gnomine landscape-common libreoffice-avmedia-backend-gstreamer libreoffice-base-core libreoffice-calc libreoffice-common libreoffice-core libreoffice-draw libreoffice-gnome libreoffice-gtk libreoffice-impress libreoffice-math libreoffice-ogltrans libreoffice-pdfimport libreoffice-style-galaxy libreoffice-style-human libreoffice-writer libsane libsane-common mcp-account-manager-uoa python3-uno rhythmbox rhythmbox-plugins rhythmbox-plugin-zeitgeist sane-utils shotwell shotwell-common telepathy-gabble telepathy-haze telepathy-idle telepathy-indicator telepathy-logger telepathy-mission-control-5 telepathy-salut totem totem-common totem-plugins printer-driver-brlaser printer-driver-foo2zjs printer-driver-foo2zjs-common printer-driver-m2300w printer-driver-ptouch printer-driver-splix || true
             git config --global user.name "mastersenpai05"
             git config --global user.email "pampangavergil0405@gmail.com"         
@@ -61,8 +61,6 @@ jobs:
        - name: Build
          run: |
               cd work
-              export TARGET_ARCH=arm64
-              export TARGET_CPU_VARIANT=cortex-a55
               . build/envsetup.sh && lunch omni_$DEVICE-eng && export ALLOW_MISSING_DEPENDENCIES=true && mka $TARGET
              
        - name: Release recovery image
