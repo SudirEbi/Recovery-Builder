@@ -28,6 +28,13 @@ jobs:
        - name: Checkout
          uses: actions/checkout@master
          
+       - name: Free up disk space
+         run: |
+            sudo apt-get clean
+            sudo rm -rf /usr/local/lib/android /usr/local/lib/node_modules /opt/ghc
+            sudo rm -rf /usr/lib/jvm /usr/lib/llvm /usr/share/dotnet /var/lib/apt/lists/*
+            sudo docker rmi $(docker images -q) || true
+         
        - name: Initializing environment
          run: |
             sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
@@ -54,6 +61,8 @@ jobs:
        - name: Build
          run: |
               cd work
+              export TARGET_ARCH=arm64
+              export TARGET_CPU_VARIANT=cortex-a55
               . build/envsetup.sh && lunch omni_$DEVICE-eng && export ALLOW_MISSING_DEPENDENCIES=true && mka $TARGET
              
        - name: Release recovery image
