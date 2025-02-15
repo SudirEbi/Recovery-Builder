@@ -17,7 +17,7 @@ env:
   DEVICE: RMX3761
   DT_LINK: https://github.com/SudirEbi/device_realme_RMX3761
   DT_PATH: device/realme/RMX3761
-  TARGET: recoveryimage
+  TARGET: bootimage
   TZ: Asia/manila
 
 jobs:
@@ -64,4 +64,4 @@ jobs:
           tag_name: TWRP_10.0
           name: TWRP-RMX3761
           files: | 
-            work/out/target/product/RMX3761/recovery.img
+            work/out/target/product/RMX3761/boot.img
