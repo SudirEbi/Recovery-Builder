@@ -43,7 +43,7 @@ jobs:
         mka bacon -j$(nproc)
 
     - name: Upload ROM artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # Updated to v4
       with:
         name: LineageOS-RMX3761
         path: ~/android/lineage/out/target/product/RMX3761/*.zip
