@@ -22,7 +22,7 @@ jobs:
 
        - name: Install the latest version of repo
          run: |
-           wget https://storage.googleapis.com/git-repo-downloads/repo-2.50 -O /usr/local/bin/repo
+           curl https://storage.googleapis.com/git-repo-downloads/repo-2.50 > /usr/local/bin/repo
            chmod +x /usr/local/bin/repo
 
        - name: Enable Debugging
