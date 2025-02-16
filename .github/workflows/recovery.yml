@@ -55,7 +55,7 @@ jobs:
          run: |
               cd twrp
               . build/envsetup.sh
-              lunch twrp_$DEVICE-eng
+              lunch omni_$DEVICE-eng
               export ALLOW_MISSING_DEPENDENCIES=true
               mka $TARGET
              
