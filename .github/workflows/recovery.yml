@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-       - name: Checkout
+       - name: Checkout repository
          uses: actions/checkout@v2
 
        - name: Enable Debugging
@@ -35,6 +35,11 @@ jobs:
          run: |
             sudo -E apt-get -qq update
             sudo -E apt-get -qq install bc build-essential zip curl libstdc++6 git wget python3 gcc clang libssl-dev repo rsync flex bison aria2 ccache
+
+       - name: Install the latest repo tool
+         run: |
+            wget https://storage.googleapis.com/git-repo-downloads/repo-2.50 -O /usr/local/bin/repo
+            chmod a+x /usr/local/bin/repo
 
        - name: Sync TWRP minimal source and device tree
          run: |
