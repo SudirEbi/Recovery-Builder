@@ -8,7 +8,7 @@ env:
   BRANCH: fox_11.0
   DEVICE: RMX3761
   DT_LINK: https://github.com/SudirEbi/vendor_realme_RMX3761
-  DT_BRANCH: fox_11.0
+  DT_BRANCH: fox_12.1
   DT_PATH: vendor/realme/RMX3761
   TARGET: recoveryimage
   TZ: Asia/Manila
