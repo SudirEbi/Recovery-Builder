@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
 
 env:
-  MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni -b twrp-10.0-deprecated
+  MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni
+  BRANCH: twrp-10.0-deprecated
   DEVICE: RMX3761
   DT_LINK: https://github.com/SudirEbi/vendor_realme_RMX3761
   DT_BRANCH: twrp-omni
@@ -46,7 +47,7 @@ jobs:
          run: |
              mkdir work
              cd work
-             repo init -u $MANIFEST --depth=1
+             repo init -u $MANIFEST -b $BRANCH --depth=1
              repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
              repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
              git clone --depth=1 -b $DT_BRANCH $DT_LINK $DT_PATH
