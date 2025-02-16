@@ -8,7 +8,8 @@ env:
   BRANCH: twrp-12.1
   DEVICE: RMX3761
   DT_LINK: https://github.com/SudirEbi/vendor_realme_RMX3761
-  DT_PATH: vendor/realme/RMX3761
+  DT_BRANCH: twrp
+  DT_PATH: device/realme/RMX3761
   TARGET: recoveryimage
   TZ: Asia/Manila
 
@@ -18,12 +19,7 @@ jobs:
 
     steps:
        - name: Checkout
-         uses: actions/checkout@v2  # Checkout the main repository
-
-       - name: Install the latest version of repo
-         run: |
-           curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo
-           chmod +x /usr/local/bin/repo
+         uses: actions/checkout@v2
 
        - name: Enable Debugging
          run: set -x  # Enables debug logging
@@ -50,7 +46,7 @@ jobs:
              echo "Listing files after repo sync:"
              ls -R
              
-             git clone --depth=1 $DT_LINK $DT_PATH
+             git clone --depth=1 -b $DT_BRANCH $DT_LINK $DT_PATH
              
              echo "Listing files after cloning device tree:"
              ls -R $DT_PATH
