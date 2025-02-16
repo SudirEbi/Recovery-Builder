@@ -1,0 +1,49 @@
+name: LineageOS Build RMX3761
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+
+    - name: Set up environment
+      run: |
+        sudo apt update && sudo apt install -y git-core gnupg flex bison \
+        gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib \
+        libc6-dev-i386 libncurses5 libncurses5-dev x11proto-core-dev \
+        libx11-dev libgl1-mesa-dev libxml2-utils xsltproc unzip python3
+
+    - name: Initialize LineageOS 20 repo
+      run: |
+        mkdir -p ~/android/lineage
+        cd ~/android/lineage
+        repo init --depth=1 -u https://github.com/LineageOS/android.git -b lineage-20.0
+        repo sync -j$(nproc) --force-sync
+
+    - name: Clone device tree, kernel, and vendor
+      run: |
+        cd ~/android/lineage
+        git clone https://github.com/MaheshSharan/device_realme_RMX3761 device/realme/RMX3761
+        git clone https://github.com/MaheshSharan/realme_C51_C53_Narzo-N53-AndroidT-kernel-source kernel/realme/RMX3761
+        git clone https://github.com/MaheshSharan/vendor_realme_RMX3761 vendor/realme/RMX3761
+
+    - name: Set up environment variables
+      run: |
+        echo "USE_CCACHE=1" >> ~/.bashrc
+        export USE_CCACHE=1
+        ccache -M 50G
+
+    - name: Build LineageOS
+      run: |
+        cd ~/android/lineage
+        source build/envsetup.sh
+        lunch lineage_RMX3761-userdebug
+        mka bacon -j$(nproc)
+
+    - name: Upload ROM artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: LineageOS-RMX3761
+        path: ~/android/lineage/out/target/product/RMX3761/*.zip
