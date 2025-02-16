@@ -20,6 +20,11 @@ jobs:
        - name: Checkout
          uses: actions/checkout@v2  # Checkout the main repository
 
+       - name: Install the latest version of repo
+         run: |
+           wget https://storage.googleapis.com/git-repo-downloads/repo-2.50 -O /usr/local/bin/repo
+           chmod +x /usr/local/bin/repo
+
        - name: Enable Debugging
          run: set -x  # Enables debug logging
 
