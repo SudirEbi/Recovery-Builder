@@ -51,6 +51,10 @@ jobs:
              repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
              git clone --depth=1 -b $DT_BRANCH $DT_LINK $DT_PATH
              
+       - name: Update device tree to inherit vendor
+         run: |
+             echo '$(call inherit-product, vendor/realme/RMX3761/device-vendor.mk)' >> $DT_PATH/omni_RMX3761.mk
+             
        - name: Build
          run: |
               cd work
