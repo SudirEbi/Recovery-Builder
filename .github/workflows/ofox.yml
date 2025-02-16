@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  MANIFEST: https://gitlab.com/OrangeFox/manifest.git
+  MANIFEST: git clone https://gitlab.com/OrangeFox/sync.git
   BRANCH: fox_12.1
   DEVICE: RMX3761
   DT_LINK: https://github.com/SudirEbi/device_realme_RMX3761
