@@ -1,16 +1,16 @@
-name: Building recovery
+name: Build TWRP 12.1
 
 on:
   workflow_dispatch:
 
 env:
-  MANIFEST: https://gitlab.com/OrangeFox/sync.git
-  BRANCH: fox_12.1
+  MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git
+  BRANCH: twrp-12.1
   DEVICE: RMX3761
   DT_LINK: https://github.com/SudirEbi/vendor_realme_RMX3761
   DT_BRANCH: twrp-omni
-  DT_PATH: vendor/realme/RMX3761
-  TARGET: bootimage
+  DT_PATH: device/realme/RMX3761
+  TARGET: recoveryimage
   TZ: Asia/Manila
 
 jobs:
@@ -36,10 +36,10 @@ jobs:
             sudo -E apt-get -qq update
             sudo -E apt-get -qq install bc build-essential zip curl libstdc++6 git wget python3 gcc clang libssl-dev repo rsync flex bison aria2 ccache
 
-       - name: Sync recovery source and device tree
+       - name: Sync TWRP minimal source and device tree
          run: |
-             mkdir work
-             cd work
+             mkdir twrp
+             cd twrp
              repo init -u $MANIFEST -b $BRANCH --depth=1
              repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
              
@@ -51,20 +51,20 @@ jobs:
              echo "Listing files after cloning device tree:"
              ls -R $DT_PATH
 
-       - name: Build Recovery
+       - name: Build TWRP Recovery
          run: |
-              cd work
+              cd twrp
               . build/envsetup.sh
-              lunch omni_$DEVICE-eng
+              lunch twrp_$DEVICE-eng
               export ALLOW_MISSING_DEPENDENCIES=true
               mka $TARGET
              
-       - name: Release recovery image
+       - name: Release TWRP recovery image
          uses: softprops/action-gh-release@v1
          env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          with:
-          tag_name: OrangeFox_12.1
-          name: OrangeFox-RMX3761
+          tag_name: TWRP_12.1
+          name: TWRP-RMX3761
           files: |
-            work/out/target/product/RMX3761/boot.img
+            twrp/out/target/product/RMX3761/recovery.img
