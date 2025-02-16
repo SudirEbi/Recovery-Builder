@@ -36,9 +36,9 @@ jobs:
             sudo -E apt-get -qq update
             sudo -E apt-get -qq install bc build-essential zip curl libstdc++6 git wget python3 gcc clang libssl-dev repo rsync flex bison aria2 ccache
 
-       - name: Install the latest repo tool
+       - name: Install the latest repo tool (using GitHub's pre-configured URL)
          run: |
-            wget https://storage.googleapis.com/git-repo-downloads/repo-2.50 -O /usr/local/bin/repo
+            curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo
             chmod a+x /usr/local/bin/repo
 
        - name: Sync TWRP minimal source and device tree
