@@ -7,7 +7,7 @@ env:
   MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git
   BRANCH: twrp-12.1
   DEVICE: RMX3761
-  DT_LINK: https://github.com/SudirEbi/twrp_realme_RMX3761/tree/main
+  DT_LINK: https://github.com/SudirEbi/twrp_realme_RMX3761.git
   DT_PATH: device/realme/RMX3761
   TARGET: recoveryimage
   TZ: Asia/Manila
@@ -19,9 +19,11 @@ jobs:
     steps:
        - name: Checkout repository
          uses: actions/checkout@v2
+         with:
+           submodules: 'recursive'
 
        - name: Enable Debugging
-         run: set -x  # Enables debug logging
+         run: set -x
 
        - name: Free up disk space
          run: |
@@ -35,10 +37,11 @@ jobs:
             sudo -E apt-get -qq update
             sudo -E apt-get -qq install bc build-essential zip curl libstdc++6 git wget python3 gcc clang libssl-dev repo rsync flex bison aria2 ccache
 
-       - name: Install the latest repo tool (using GitHub's pre-configured URL)
+       - name: Install the latest repo tool
          run: |
-            curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo
-            chmod a+x /usr/local/bin/repo
+            curl https://storage.googleapis.com/git-repo-downloads/repo > repo
+            chmod a+x repo
+            sudo mv repo /usr/local/bin/
 
        - name: Sync TWRP minimal source and device tree
          run: |
@@ -47,13 +50,11 @@ jobs:
              repo init -u $MANIFEST -b $BRANCH --depth=1
              repo sync -c -j4 --force-sync --no-clone-bundle --no-tags
              
-             echo "Listing files after repo sync:"
-             ls -R
+             echo "Cloning device tree..."
+             git clone --depth=1 $DT_LINK $DT_PATH
              
-             git clone --depth=1 -b $DT_BRANCH $DT_LINK $DT_PATH
-             
-             echo "Listing files after cloning device tree:"
-             ls -R $DT_PATH
+             echo "Cloning vendor tree..."
+             git clone --depth=1 https://github.com/SudirEbi/vendor_realme_RMX3761.git vendor/realme/RMX3761
 
        - name: Build TWRP Recovery
          run: |
