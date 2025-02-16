@@ -7,8 +7,7 @@ env:
   MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git
   BRANCH: twrp-12.1
   DEVICE: RMX3761
-  DT_LINK: https://github.com/SudirEbi/vendor_realme_RMX3761
-  DT_BRANCH: twrp
+  DT_LINK: https://github.com/SudirEbi/twrp_realme_RMX3761/tree/main
   DT_PATH: device/realme/RMX3761
   TARGET: recoveryimage
   TZ: Asia/Manila
