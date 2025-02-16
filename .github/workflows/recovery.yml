@@ -15,7 +15,7 @@ on:
 env:
   MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni -b twrp-10.0-deprecated
   DEVICE: RMX3761
-  DT_LINK: https://github.com/SudirEbi/device_realme_RMX3761
+  DT_LINK: https://github.com/SudirEbi/vendor_realme_RMX3761
   DT_PATH: device/realme/RMX3761
   TARGET: bootimage
   TZ: Asia/manila
