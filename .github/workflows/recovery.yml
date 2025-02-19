@@ -8,6 +8,7 @@ env:
   BRANCH: twrp-12.1
   DEVICE: RMX3761
   DT_LINK: https://github.com/SudirEbi/twrp_realme_RMX3761.git
+  DT_BRANCH: twrp
   DT_PATH: device/realme/RMX3761
   TARGET: recoveryimage
   TZ: Asia/Manila
@@ -60,7 +61,7 @@ jobs:
          run: |
               cd twrp
               . build/envsetup.sh
-              lunch omni_$DEVICE-eng
+              lunch twrp_$DEVICE-eng
               export ALLOW_MISSING_DEPENDENCIES=true
               mka $TARGET
              
