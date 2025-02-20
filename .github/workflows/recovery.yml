@@ -40,7 +40,7 @@ on:
       BUILD_TARGET:
         description: 'BUILD_TARGET'
         required: true
-        default: 'boot'  # 🔄 Changed from recovery to boot
+        default: 'boot'
 
 jobs:
   build:
@@ -116,7 +116,7 @@ jobs:
 
     - name: Clone vendor tree
       run: |
-        git clone --depth=1 -b twrp https://github.com/SudirEbi/vendor_realme_RMX3761.git vendor/realme/RMX3761
+        git clone --depth=1 -b twrp https://github.com/SudirEbi/vendor_realme_RMX3761.git vendor/realme/RMX3761  # 🔄 Fixed repo and branch
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Clone common tree
@@ -157,7 +157,7 @@ jobs:
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
-        files: workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/boot.img  # 🔄 Changed to boot.img
+        files: workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/boot.img  # 🔄 Corrected target
         name: ${{ github.event.inputs.DEVICE_NAME }}-${{ github.run_id }}
         tag_name: ${{ github.run_id }}
         body: |
