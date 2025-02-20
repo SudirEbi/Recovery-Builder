@@ -23,15 +23,13 @@ jobs:
          with:
            submodules: 'recursive'
 
-       - name: Enable Debugging
-         run: set -x
-
-       - name: Free up disk space (Safe Cleanup)
+       - name: Free up disk space
          run: |
             sudo apt-get clean
-            sudo rm -rf /usr/local/lib/node_modules /opt/ghc \
-                /usr/share/dotnet /usr/share/man /usr/share/doc /usr/share/info \
-                /var/cache/apt/* /var/lib/apt/lists/*
+            sudo rm -rf /usr/local/lib/node_modules /opt/ghc /usr/lib/jvm \
+                /usr/lib/llvm /usr/share/dotnet /usr/share/man /usr/share/doc /usr/share/info \
+                /usr/local/lib/python* /usr/local/cuda* /usr/lib/gcc /usr/bin \
+                /var/cache/apt/* /var/lib/apt/lists/* ~/.cache
             docker system prune -af --volumes
 
        - name: Install dependencies
@@ -40,24 +38,22 @@ jobs:
             sudo -E apt-get -qq install bc build-essential zip curl git wget python3 \
                 gcc clang libssl-dev repo rsync flex bison aria2 ccache
 
-       - name: Install the latest repo tool
+       - name: Sync TWRP minimal source
          run: |
-            curl https://storage.googleapis.com/git-repo-downloads/repo > repo
-            chmod a+x repo
-            sudo mv repo /usr/local/bin/
-
-       - name: Sync TWRP minimal source and device tree (Optimized)
-         run: |
-             mkdir twrp
-             cd twrp
+             mkdir twrp && cd twrp
              repo init -u $MANIFEST -b $BRANCH --depth=1
-             repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
-             
-             echo "Cloning device tree..."
-             git clone --depth=1 --filter=blob:none $DT_LINK -b $DT_BRANCH $DT_PATH
-             
-             echo "Cloning vendor tree..."
-             git clone --depth=1 --filter=blob:none https://github.com/SudirEbi/vendor_realme_RMX3761.git vendor/realme/RMX3761
+             repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune --partial-clone
+
+       - name: Remove unneeded files to free space
+         run: |
+             cd twrp
+             rm -rf prebuilts/ndk prebuilts/sdk prebuilts/corretto prebuilts/gcc prebuilts/gradle
+             rm -rf external/chromium-trace external/perfetto external/mesa3d
+
+       - name: Clone device and vendor trees
+         run: |
+             git clone --depth=1 -b twrp $DT_LINK $DT_PATH
+             git clone --depth=1 -b twrp https://github.com/SudirEbi/vendor_realme_RMX3761.git vendor/realme/RMX3761
 
        - name: Build TWRP Recovery
          run: |
@@ -65,8 +61,8 @@ jobs:
               . build/envsetup.sh
               lunch twrp_$DEVICE-eng
               export ALLOW_MISSING_DEPENDENCIES=true
-              mka $TARGET BUILD_WITHOUT_VENDOR=true
-
+              mka recoveryimage -j2
+             
        - name: Release TWRP recovery image
          uses: softprops/action-gh-release@v1
          env:
