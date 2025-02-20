@@ -20,10 +20,10 @@ on:
         description: 'OrangeFox Device Tree'
         required: true
         default: 'https://github.com/SudirEbi/vendor_realme_RMX3761.git'
-      DEVICE_TREE_BRANCH: twrp
+      DEVICE_TREE_BRANCH: 
         description: 'OrangeFox Device Tree Branch'
         required: true
-        default: 'android-12.1'
+        default: 'twrp'
       DEVICE_PATH:
         description: 'Specify your Device Path'
         required: true
