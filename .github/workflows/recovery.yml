@@ -1,11 +1,11 @@
-name: Build TWRP 12.1
+name: Build TWRP 11
 
 on:
   workflow_dispatch:
 
 env:
   MANIFEST: https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git
-  BRANCH: twrp-12.1
+  BRANCH: twrp-11  # 🔄 Switched from twrp-12.1 to twrp-11
   DEVICE: RMX3761
   DT_LINK: https://github.com/SudirEbi/twrp_realme_RMX3761.git
   DT_BRANCH: twrp
@@ -20,35 +20,18 @@ jobs:
     steps:
        - name: Checkout repository
          uses: actions/checkout@v2
-         with:
-           submodules: 'recursive'
-
-       - name: Free up disk space
-         run: |
-            sudo apt-get clean
-            sudo rm -rf /usr/local/lib/node_modules /opt/ghc /usr/lib/jvm \
-                /usr/lib/llvm /usr/share/dotnet /usr/share/man /usr/share/doc /usr/share/info \
-                /usr/local/lib/python* /usr/local/cuda* /usr/lib/gcc /usr/bin \
-                /var/cache/apt/* /var/lib/apt/lists/* ~/.cache
-            docker system prune -af --volumes
 
        - name: Install dependencies
          run: |
-            sudo -E apt-get -qq update
-            sudo -E apt-get -qq install bc build-essential zip curl git wget python3 \
+            sudo apt-get update -qq
+            sudo apt-get install -y bc build-essential zip curl git wget python3 \
                 gcc clang libssl-dev repo rsync flex bison aria2 ccache
 
        - name: Sync TWRP minimal source
          run: |
              mkdir twrp && cd twrp
              repo init -u $MANIFEST -b $BRANCH --depth=1
-             repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune --partial-clone
-
-       - name: Remove unneeded files to free space
-         run: |
-             cd twrp
-             rm -rf prebuilts/ndk prebuilts/sdk prebuilts/corretto prebuilts/gcc prebuilts/gradle
-             rm -rf external/chromium-trace external/perfetto external/mesa3d
+             repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
        - name: Clone device and vendor trees
          run: |
@@ -68,7 +51,7 @@ jobs:
          env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          with:
-          tag_name: TWRP_12.1
+          tag_name: TWRP_11
           name: TWRP-RMX3761
           files: |
             twrp/out/target/product/RMX3761/recovery.img
