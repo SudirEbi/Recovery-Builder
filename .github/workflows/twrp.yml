@@ -61,14 +61,12 @@ jobs:
         echo "Makefile Name: ${{ github.event.inputs.MAKEFILE_NAME }}"
         echo "Build Target: ${{ github.event.inputs.BUILD_TARGET }}.img"
         echo "::endgroup::"
- 
-    # You might want to Checkout your repo first, but not mandatory
+
     - name: Check Out
       uses: actions/checkout@v3
-    # Cleanup The Actions Workspace Using Custom Composite Run Actions
+
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
-      # That's it! Now use your normal steps
 
     - name: Prepare the environment
       run: |
@@ -95,24 +93,33 @@ jobs:
         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
-      
+
     - name: Initialize repo
       run: |
-        mkdir workspace
-        cd workspace
-        echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
-        git config --global user.name "mominqimiang"
-        git config --global user.email "3227495621@qq.com"
-        repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        if [ -d "workspace" ]; then
+          echo "Workspace exists, skipping repo init"
+        else
+          mkdir workspace
+          cd workspace
+          echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
+          git config --global user.name "mominqimiang"
+          git config --global user.email "3227495621@qq.com"
+          repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        fi
       id: pwd
-          
+
     - name: Repo Sync
       run: |
-        repo sync -j$(nproc --all) --force-sync
+        if [ -d "workspace" ]; then
+          echo "Skipping full repo sync, workspace exists"
+        else
+          repo sync -j$(nproc --all) --force-sync
+        fi
       working-directory: workspace
-      
-    - name: Clone device tree
+
+    - name: Resync Vendor
       run: |
+        rm -rf ./${{ github.event.inputs.DEVICE_PATH }}
         git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
@@ -161,6 +168,6 @@ jobs:
           Manifest: ${{ github.event.inputs.MANIFEST_BRANCH }}
           Device: ${{ github.event.inputs.DEVICE_NAME }}
           Target: vendor_boot.img
-          Version:Android13
+          Version: Android13
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
