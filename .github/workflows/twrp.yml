@@ -1,7 +1,40 @@
 name: Recovery Build
 
-on:  
+on:
   workflow_dispatch:
+    inputs:
+      MANIFEST_URL:
+        description: 'Manifest URL'
+        required: true
+        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp'
+      MANIFEST_BRANCH:
+        description: 'Manifest Branch'
+        required: true
+        default: 'twrp-12.1'
+      DEVICE_TREE_URL:
+        description: 'Device Tree URL'
+        required: true
+        default: 'https://github.com/SudirEbi/vendor_realme_RMX3761'
+      DEVICE_TREE_BRANCH:
+        description: 'Device Tree Branch'
+        required: true
+        default: 'twrp'
+      DEVICE_PATH:
+        description: 'Device Path'
+        required: true
+        default: 'device/realme/RMX3761'
+      DEVICE_NAME:
+        description: 'Device Name'
+        required: true
+        default: 'RMX3761'
+      MAKEFILE_NAME:
+        description: 'Makefile Name'
+        required: true
+        default: 'twrp_RMX3761'
+      BUILD_TARGET:
+        description: 'Build Target'
+        required: true
+        default: 'vendorboot'
 
 jobs:
   build:
@@ -10,5 +43,13 @@ jobs:
       - name: Check Out
         uses: actions/checkout@v3
 
-      - name: Print Test Message
-        run: echo "Workflow started successfully!"
+      - name: Print Inputs
+        run: |
+          echo "Manifest URL: ${{ github.event.inputs.MANIFEST_URL }}"
+          echo "Manifest Branch: ${{ github.event.inputs.MANIFEST_BRANCH }}"
+          echo "Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}"
+          echo "Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}"
+          echo "Device Path: ${{ github.event.inputs.DEVICE_PATH }}"
+          echo "Device Name: ${{ github.event.inputs.DEVICE_NAME }}"
+          echo "Makefile Name: ${{ github.event.inputs.MAKEFILE_NAME }}"
+          echo "Build Target: ${{ github.event.inputs.BUILD_TARGET }}.img"
