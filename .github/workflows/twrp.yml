@@ -1,52 +1,35 @@
 name: Recovery Build
 
-on: workflow_dispatch: inputs: MANIFEST_URL: description: 'MANIFEST_URL' required: true default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp' MANIFEST_BRANCH: description: 'MANIFEST_BRANCH' required: true default: 'twrp-12.1' DEVICE_TREE_URL: description: 'DEVICE_TREE_URL' required: true default: 'https://github.com/SudirEbi/vendor_realme_RMX3761' DEVICE_TREE_BRANCH: description: 'DEVICE_TREE_BRANCH' required: true default: 'twrp' DEVICE_PATH: description: 'DEVICE_PATH' required: true default: 'device/realme/RMX3761' DEVICE_NAME: description: 'DEVICE_NAME' required: true default: 'RMX3761' MAKEFILE_NAME: description: 'MAKEFILE_NAME' required: true default: 'twrp_RMX3761' BUILD_TARGET: description: 'BUILD_TARGET' required: true default: 'vendorboot'
+on: workflow_dispatch: inputs: MANIFEST_URL: description: 'MANIFEST_URL (if want to use SSH keys, use git@github.com:XXXXX)' required: true default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp' MANIFEST_BRANCH: description: 'MANIFEST_BRANCH' required: true default: 'twrp-12.1' DEVICE_TREE_URL: description: 'DEVICE_TREE_URL' required: true default: 'https://github.com/SudirEbi/vendor_realme_RMX3761' DEVICE_TREE_BRANCH: description: 'DEVICE_TREE_BRANCH' required: true default: 'twrp' DEVICE_PATH: description: 'DEVICE_PATH' required: true default: 'device/realme/RMX3761' DEVICE_NAME: description: 'DEVICE_NAME' required: true default: 'RMX3761' MAKEFILE_NAME: description: 'MAKEFILE_NAME' required: true default: 'twrp_RMX3761' BUILD_TARGET: description: 'BUILD_TARGET' required: true default: 'vendorboot'
 
 jobs: build: if: github.event.repository.owner.id == github.event.sender.id runs-on: ubuntu-20.04 permissions: contents: write steps: - name: Check Out uses: actions/checkout@v3
 
-- name: Install Dependencies
+- name: Restore Workspace
   run: |
-    sudo apt update && sudo apt -y install gperf gcc-multilib g++-multilib libncurses5-dev lzop bc ccache
-
-- name: Install OpenJDK
-  uses: actions/setup-java@v3
-  with:
-    distribution: 'zulu'
-    java-version: '8'
-
-- name: Initialize repo (if needed)
-  run: |
-    if [ ! -d "workspace" ]; then
+    if [ -d "workspace" ]; then
+      echo "Workspace found, continuing build."
+    else
+      echo "No workspace found, initializing repo."
       mkdir workspace && cd workspace
       git config --global user.name "mominqimiang"
       git config --global user.email "3227495621@qq.com"
       repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+      repo sync -j$(nproc --all) --force-sync
     fi
-  id: pwd
+  working-directory: .
 
-- name: Repo Sync (Skip if workspace exists)
+- name: Resync Device Tree
   run: |
-    if [ -d "workspace" ]; then
-      echo "Skipping full repo sync, workspace exists"
-    else
-      repo sync -j$(nproc --all)
-    fi
+    rm -rf ./${{ github.event.inputs.DEVICE_PATH }}
+    git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
   working-directory: workspace
 
-- name: Sync Device Tree (without deleting)
-  run: |
-    if [ -d "${{ github.event.inputs.DEVICE_PATH }}" ]; then
-      cd ${{ github.event.inputs.DEVICE_PATH }} && git pull origin ${{ github.event.inputs.DEVICE_TREE_BRANCH }}
-    else
-      git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
-    fi
-  working-directory: workspace
-
-- name: Building recovery
+- name: Building Recovery
   run: |
     source build/envsetup.sh
     export ALLOW_MISSING_DEPENDENCIES=true
-    lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
+    lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng
+    make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
   working-directory: workspace
 
 - name: Upload to Release
